@@ -3,7 +3,7 @@
 
 * For points to be done, ~ for answers to the points
 
-#Roadmap for the project
+# Roadmap for the project
 
 * Finish style transfer algorithm from TensorFlow website
     * Play around with it and see what we can build on, what we want to change
@@ -24,7 +24,7 @@
 
 
 
-#APP Feature List
+# App Feature List
 
 * Slider-type thing for style vs content 
     * Photo-realstic on one end, style distortion on the other end

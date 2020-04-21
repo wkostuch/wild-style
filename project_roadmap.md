@@ -9,6 +9,7 @@
     * Play around with it and see what we can build on, what we want to change
         * Pull from different layers, see what we get
         * Set up a fat script to run through lots of permutation and see what we get as results
+            * Multi-thread this?
 
 * Slider with style vs content 
 
@@ -18,6 +19,8 @@
 
 * Need to look into size mis-match between pictures
     * Aspect ratio, then upscale/downscale
+
+
 
 
 

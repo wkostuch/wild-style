@@ -28,8 +28,8 @@ import time
 
 
 # Global variables
-content_path = "images/content/dubrovnik.jpg"
-style_path = "images/style/canaletto.jpg"
+content_path = "../images/content/dubrovnik.jpg"
+style_path = "../images/style/canaletto.jpg"
 
 # The style transfer technique uses a pretrained image classification neural
 # network from the Oxford Visual Geometry Group (VGG).  The technique pulls the

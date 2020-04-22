@@ -2,6 +2,7 @@
 
 import tensorflow as tf
 import tensorflow_hub as hub
+import cv2
 
 import IPython.display as display
 
@@ -11,7 +12,7 @@ mpl.rcParams['figure.figsize'] = (12,12)
 mpl.rcParams['axes.grid'] = False
 
 import numpy as np
-import PIL.Image
+from PIL import Image
 import time
 import functools
 
@@ -23,7 +24,7 @@ def tensor_to_image(tensor):
   if np.ndim(tensor)>3:
     assert tensor.shape[0] == 1
     tensor = tensor[0]
-  return PIL.Image.fromarray(tensor)
+  return Image.fromarray(tensor)
 
 content_path = tf.keras.utils.get_file('YellowLabradorLooking_new.jpg', 'https://storage.googleapis.com/download.tensorflow.org/example_images/YellowLabradorLooking_new.jpg')
 
@@ -49,7 +50,7 @@ def load_img(path_to_img):
   return img
 
 def imshow(image, title=None):
-  if len(image.shape) > 3:
+  if len(image.shape) >= 3:
     image = tf.squeeze(image, axis=0)
 
   plt.imshow(image)
@@ -211,11 +212,14 @@ def style_content_loss(outputs):
     loss = style_loss + content_loss
     return loss
 
+total_variation_weight=30
+
 @tf.function()
 def train_step(image):
   with tf.GradientTape() as tape:
     outputs = extractor(image)
     loss = style_content_loss(outputs)
+    loss += total_variation_weight*tf.image.total_variation(image)
 
   grad = tape.gradient(loss, image)
   opt.apply_gradients([(grad, image)])
@@ -225,7 +229,27 @@ def train_step(image):
 train_step(image)
 train_step(image)
 train_step(image)
+'''
+image = tf.Variable(content_image)
+import time
+start = time.time()
 
+epochs = 10
+steps_per_epoch = 100
+
+step = 0
+for n in range(epochs):
+  for m in range(steps_per_epoch):
+    step += 1
+    train_step(image)
+    print(".", end='')
+  display.clear_output(wait=True)
+  display.display(tensor_to_image(image))
+  print("Train step: {}".format(step))
+
+end = time.time()
+print("Total time: {:.1f}".format(end-start))
+'''
 
 file_name = 'stylized-image.png'
-tensor_to_image(image).save(file_name)
+tensor_to_image(image).show(title="pic") #.save(file_name)

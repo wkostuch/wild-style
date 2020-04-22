@@ -1,22 +1,31 @@
-# Following code is from the TensorFlow tutorial found at: https://www.tensorflow.org/tutorials/generative/style_transfer
+# The following code was pulled from:
+# https://www.tensorflow.org/tutorials/generative/style_transfer
+# and modified as needed for our project.  
 
+
+'''
+Set up all the necessary imports 
+'''
 import tensorflow as tf
 import tensorflow_hub as hub
-import cv2
 
 import IPython.display as display
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-mpl.rcParams['figure.figsize'] = (12,12)
-mpl.rcParams['axes.grid'] = False
 
 import numpy as np
+
 from PIL import Image
+
 import time
+
 import functools
 
 import cv2
+
+mpl.rcParams['figure.figsize'] = (12,12)
+mpl.rcParams['axes.grid'] = False
 
 def tensor_to_image(tensor):
   tensor = tensor*255
@@ -26,11 +35,10 @@ def tensor_to_image(tensor):
     tensor = tensor[0]
   return Image.fromarray(tensor)
 
-content_path = tf.keras.utils.get_file('YellowLabradorLooking_new.jpg', 'https://storage.googleapis.com/download.tensorflow.org/example_images/YellowLabradorLooking_new.jpg')
 
-# https://commons.wikimedia.org/wiki/File:Vassily_Kandinsky,_1913_-_Composition_7.jpg
-style_path = tf.keras.utils.get_file('kandinsky5.jpg', \
-                                'https://storage.googleapis.com/download.tensorflow.org/example_images/Vassily_Kandinsky%2C_1913_-_Composition_7.jpg')
+#Get the file-paths for our images
+content_path = "../images/content/lakeside.png"
+style_path =  "../images/style/colors.png"
 
 
 def load_img(path_to_img):
@@ -226,30 +234,30 @@ def train_step(image):
   image.assign(clip_0_1(image))
 
 
-train_step(image)
-train_step(image)
-train_step(image)
-'''
+#train_step(image)
+#train_step(image)
+#train_step(image)
+
 image = tf.Variable(content_image)
 import time
 start = time.time()
 
-epochs = 10
-steps_per_epoch = 100
+epochs = 5
+steps_per_epoch = 10
 
 step = 0
 for n in range(epochs):
   for m in range(steps_per_epoch):
     step += 1
     train_step(image)
-    print(".", end='')
+    #print(".", end='')
   display.clear_output(wait=True)
-  display.display(tensor_to_image(image))
+  #display.display(tensor_to_image(image))
   print("Train step: {}".format(step))
 
 end = time.time()
 print("Total time: {:.1f}".format(end-start))
-'''
+
 
 file_name = 'stylized-image.png'
 tensor_to_image(image).show(title="pic") #.save(file_name)

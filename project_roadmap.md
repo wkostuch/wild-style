@@ -5,29 +5,26 @@
 
 # Roadmap for the project
 
-* Finish style transfer algorithm from TensorFlow website
-    * Play around with it and see what we can build on, what we want to change
-        * Pull from different layers, see what we get
-        * Set up a fat script to run through lots of permutation and see what we get as results
-            * Multi-thread this?
+## Finished
+* Implemented basic style transfer algorithm from TensorFlow tutorial
+   * Done.  Initial demo based on tutorial here: https://colab.research.google.com/github/tensorflow/hub/blob/master/examples/colab/tf2_arbitrary_image_stylization.ipynb#scrollTo=dqB6aNTLNVkK
 
-* Slider with style vs content 
+## Next Up
+* Set up Python virtual environment for the code base.
+* Discover new wasy of creating output images.
+   * Try pulling different layers from the VGG19 model.
+   * Try giving different weights to content/style in the loss function.
+   * Different training processes.
+   * More photrealistic vs more painterly.
 
-* Look into "plug and play" with models built in Python transferring to Kotlin/other languages
-
-* VGG19 finds objects, we then style those and put them back into the image
-
-* Need to look into size mis-match between pictures
-    * Aspect ratio, then upscale/downscale
-
-
-
-
-
+## Down the Road
+* Compile some pretrained models for "plug and play" functionality.
+* Do style transfer in real-time with video.
+* Do style transfer on specific objects in the image, while preserving the rest of the image.
+* Unify under a single user interface (graphical or command line)
 
 
-
-# App Feature List
+# Android App Feature List
 
 * Slider-type thing for style vs content 
     * Photo-realstic on one end, style distortion on the other end
@@ -36,9 +33,3 @@
     * Have some style references built in
     * Camera support? 
         * If it's fast enough: video with limited frames; if it's slow then perhaps time-lapse 
-        
-* Pre-built models, kind of like picking a filter but instead it's a model 
-
-
-* Bonus: 
-    * Object detection where you can overlay a styled version of that (say take a tree, style it, then put it back into the photo)

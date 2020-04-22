@@ -23,6 +23,13 @@ import time
 import functools
 
 import cv2
+'''
+End of imports
+'''
+
+
+
+
 
 mpl.rcParams['figure.figsize'] = (12,12)
 mpl.rcParams['axes.grid'] = False
@@ -37,8 +44,8 @@ def tensor_to_image(tensor):
 
 
 #Get the file-paths for our images
-content_path = "../images/content/lakeside.png"
-style_path =  "../images/style/colors.png"
+content_path = "../images/content/dubrovnik.png"
+style_path =  "../images/style/starry_night.png"
 
 
 def load_img(path_to_img):
@@ -243,21 +250,49 @@ import time
 start = time.time()
 
 epochs = 5
-steps_per_epoch = 10
+steps_per_epoch = 5
+total_steps = epochs * steps_per_epoch
 
 step = 0
 for n in range(epochs):
   for m in range(steps_per_epoch):
     step += 1
     train_step(image)
-    #print(".", end='')
   display.clear_output(wait=True)
   #display.display(tensor_to_image(image))
-  print("Train step: {}".format(step))
+  print("Train step: {} out of {}".format(step, total_steps))
 
 end = time.time()
 print("Total time: {:.1f}".format(end-start))
 
 
-file_name = 'stylized-image.png'
-tensor_to_image(image).show(title="pic") #.save(file_name)
+
+img = tensor_to_image(image)
+img.show(title="pic") 
+
+'''
+Ask if the user wants to save the picture
+'''
+save_answers = ["y", "Y", "Yes", "yes"]
+do_not_save_answers = ["n", "N", "No", "no"]
+
+file_path = "../images/results/"
+file_name = file_path + "test_image.png"
+while(True):
+    answer = input("Would you like to save this picture? (y/n): ")
+    #Invalid input
+    if answer not in save_answers and answer not in do_not_save_answers:
+        print("Hmm, that didn't look like a valid input...please try again.")
+        continue
+    elif answer in do_not_save_answers:
+        print("Picture not being saved.  Hopefully you'll find one you like better in the future.")
+        break
+    elif answer in save_answers:
+        print("Your lovely creation is being saved, please wait a moment. . .")
+        img.save(file_name, "PNG")
+        print("Your picture has been saved at: " + file_name)
+        break
+'''
+End of saving
+'''
+

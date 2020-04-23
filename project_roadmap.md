@@ -7,15 +7,20 @@
 
 ## Finished
 * Implemented basic style transfer algorithm from TensorFlow tutorial
-   * Done.  Initial demo based on tutorial here: https://colab.research.google.com/github/tensorflow/hub/blob/master/examples/colab/tf2_arbitrary_image_stylization.ipynb#scrollTo=dqB6aNTLNVkK
+  ~ Initial demo based on tutorial here: https://colab.research.google.com/github/tensorflow/hub/blob/master/examples/colab/tf2_arbitrary_image_stylization.ipynb#scrollTo=dqB6aNTLNVkK
+* Set up Python virtual environment for the code base.
+  ~ Added requirements.txt file and README instructions for setting up the required dependencies.
 
 ## Next Up
-* Set up Python virtual environment for the code base.
 * Discover new wasy of creating output images.
-   * Try pulling different layers from the VGG19 model.
-   * Try giving different weights to content/style in the loss function.
-   * Different training processes.
-   * More photrealistic vs more painterly.
+  * Try pulling different layers from the VGG19 model.
+  * Try giving different weights to content/style in the loss function.
+  * Different training processes.
+  * More photrealistic vs more painterly.
+* Fold pretrained more closely into the codebase.
+  * Eliminate the need for dowloading VGG19 weights before running the code.
+  * Get a locally-based copy of the model for fast style transfer.
+   
 
 ## Down the Road
 * Compile some pretrained models for "plug and play" functionality.
@@ -27,7 +32,7 @@
 # Android App Feature List
 
 * Slider-type thing for style vs content 
-    * Photo-realstic on one end, style distortion on the other end
+  * Photo-realstic on one end, style distortion on the other end
 
 * Pick two images from camera roll
     * Have some style references built in

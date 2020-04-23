@@ -24,9 +24,8 @@ End of imports
 
 # Loads a model from a filepath and returns that loaded model
 def import_model(filepath: str):
-    model_handle = filepath
-    model_module = hub.load(model_handle)
-    return model_module
+    model = tf.keras.models.load_model(filepath)
+    return model
 
 
 # Returns the outputs of the model with two inputs: content_image and style_image
@@ -69,7 +68,6 @@ def main():
     #img = get_styled_image(module, )
 
     print(type(module))
-    print(module.summary())
 
 
 #Wow, we're being run on our own!

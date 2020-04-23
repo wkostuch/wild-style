@@ -201,7 +201,7 @@ image = tf.Variable(content_image)
 def clip_0_1(image):
     return tf.clip_by_value(image, clip_value_min=0.0, clip_value_max=1.0)
 
-opt = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
+optimizer = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
 
 
 style_weight=1e-2
@@ -231,7 +231,7 @@ def train_step(image):
         loss += total_variation_weight*tf.image.total_variation(image)
 
     grad = tape.gradient(loss, image)
-    opt.apply_gradients([(grad, image)])
+    optimizer.apply_gradients([(grad, image)])
     image.assign(clip_0_1(image))
 
 

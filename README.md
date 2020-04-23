@@ -1,6 +1,10 @@
 # wild-style
 Style transfer on images through machine learning.
 
+# Usage
+## Installation
+Run the command pip install -r requirements.txt to install the required dependencies.
+
 # References
 ## Papers
 ### A Neural Algorithm of Artistic Style

@@ -247,7 +247,7 @@ image = tf.Variable(content_image)
 start = time.time()
 
 epochs = 5
-steps_per_epoch = 5
+steps_per_epoch = 20
 total_steps = epochs * steps_per_epoch
 
 #Run the picture through the styling method a bunch of times
@@ -273,20 +273,22 @@ Styling is over!
 '''
 Ask if the user wants to save the picture
 '''
-save_answers = ["y", "Y", "Yes", "yes"]
+save_answers = ["y", "Y", "Yes", "yes", "ye", "Ye"]
 do_not_save_answers = ["n", "N", "No", "no"]
 
 file_path = "../images/results/"
 file_name = file_path + "test_image.png"
 while(True):
     answer = input("Would you like to save this picture? (y/n): ")
-    #Invalid input
+    # Case for: invalid input.
     if answer not in save_answers and answer not in do_not_save_answers:
         print("Hmm, that didn't look like a valid input...please try again.")
         continue
+    # Case for: the user doesn't want to save the picture.
     elif answer in do_not_save_answers:
         print("Picture not being saved.  Hopefully you'll find one you like better in the future.")
         break
+    # Case for: the user does want to save the picture.
     elif answer in save_answers:
         print("Your lovely creation is being saved, please wait a moment. . .")
         img.save(file_name, "PNG")

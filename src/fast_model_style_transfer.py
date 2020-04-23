@@ -17,16 +17,42 @@ import time
 import functools
 
 import cv2
+
+import method_library as meth
 '''
 End of imports
 '''
 
 
+#Get the file-paths for our images
+content_path = "../images/content/ud_capp_patio.png"
+style_path =  "../images/style/monet_bridge.png"
+
+#Load the image into a tensor
+def load_img(path_to_img):
+    max_dim = 512
+    img = tf.io.read_file(path_to_img)
+    img = tf.image.decode_image(img, channels=3)
+    img = tf.image.convert_image_dtype(img, tf.float32)
+
+    #Compute new dimensions for the image
+    shape = tf.cast(tf.shape(img)[:-1], tf.float32)
+    long_dim = max(shape)
+    scale = max_dim / long_dim
+    new_shape = tf.cast(shape * scale, tf.int32)
+
+    #Resize the image-tensor
+    img = tf.image.resize(img, new_shape)
+    img = img[tf.newaxis, :]
+    return img
+
+
 # Loads a model from a filepath and returns that loaded model
 def import_model(filepath: str):
     model_handle = filepath
-    model_module = hub.load(model_handle)
-    return model_module
+    model = hub.load(model_handle)
+    #model = tf.keras.models.load_model(filepath)
+    return model
 
 
 # Returns the outputs of the model with two inputs: content_image and style_image
@@ -61,15 +87,20 @@ Need to make methods for getting the image from filepath, turning it into a tens
 '''
 
 
-
 # A main() method to run when the file is run on its own
 def main():
-    filepath = "../models/fast_model"
-    module = import_model(filepath)
+    filepath = "../models/fast_model/"
+    content_image = load_img(content_path)
+    style_image = load_img(style_path)
+    model = import_model(filepath)
+    outputs = model(tf.constant(content_image), tf.constant(style_image))
+    stylized_image = outputs[0]
+    print(type(stylized_image))
+    meth.imshow(stylized_image)
     #img = get_styled_image(module, )
 
-    print(type(module))
-    print(module.summary())
+    print(type(model))
+    #print(model.summary())
 
 
 #Wow, we're being run on our own!

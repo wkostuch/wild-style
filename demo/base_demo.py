@@ -62,11 +62,11 @@ def tensor_to_image(tensor):
 def imshow(image, title=None):
     if len(image.shape) >= 3:
         image = tf.squeeze(image, axis=0)
-        img = tensor_to_image(image)
-        if title:
-            img.show(title=title)
-        else: 
-            img.show(title="Picture")
+    img = tensor_to_image(image)
+    if title:
+        img.show(title=title)
+    else: 
+        img.show(title="Picture")
 
 
 content_image = load_img(content_path)

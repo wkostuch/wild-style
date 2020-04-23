@@ -1,0 +1,1 @@
+# A file to consolidate useful methods.

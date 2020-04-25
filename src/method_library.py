@@ -13,13 +13,13 @@ def import_image(path):
     """Read an image into a cv2 object.
 
     Parameters:
-    path (string): Filepath to an image
+    - path (string): Filepath to an image
 
     Returns:
-    cv2 image
+    - cv2 image
 
     Supported file types:
-    .png
+    - .png
     """
 
     # List of supported file extensions as a tuple.
@@ -40,16 +40,16 @@ def import_image(path):
     return img
 
 
-
-
 #Takes a tensor and returns one that can be displayed via Pillow
 def tensor_to_image(tensor):
     """
     Transforms a tensor into one that can be dispalyed via Pillow
 
-    Parameters: tensor
+    Parameters
+    - tensor
 
-    Returns: tensor
+    Returns
+    - tensor
     """
     tensor = tensor*255
     tensor = np.array(tensor, dtype=np.uint8)

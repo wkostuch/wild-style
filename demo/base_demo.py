@@ -25,8 +25,9 @@ End of imports
 
 
 #Get the file-paths for our images
-content_path = "../images/content/ud_capp_patio.png"
-style_path =  "../images/style/monet_bridge.png"
+content_path = "../images/content/rome_waterfront.png"
+#style_path =  "../images/style/monet_haystacks.png"
+style_path = "../images/results/rome+starry_night.png"
 
 #Load the image into a tensor
 def load_img(path_to_img):
@@ -246,8 +247,8 @@ image = tf.Variable(content_image)
 
 start = time.time()
 
-epochs = 10
-steps_per_epoch = 100
+epochs = 20
+steps_per_epoch = 10
 total_steps = epochs * steps_per_epoch
 
 #Run the picture through the styling method a bunch of times
@@ -277,7 +278,7 @@ save_answers = ["y", "Y", "Yes", "yes", "ye", "Ye"]
 do_not_save_answers = ["n", "N", "No", "no"]
 
 file_path = "../images/results/"
-file_name = file_path + "test_image.png"
+file_name = file_path + "rome+haystacks_150_steps.png"
 while(True):
     answer = input("Would you like to save this picture? (y/n): ")
     # Case for: invalid input.

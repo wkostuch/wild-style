@@ -25,8 +25,8 @@ End of imports
 
 
 #Get the file-paths for our images
-content_path = "../images/content/ud_capp_patio.png"
-style_path =  "../images/style/monet_bridge.png"
+content_path = "../images/content/rome_waterfront.png"
+style_path =  "../images/style/starry_night.png"
 
 #Load the image into a tensor
 def load_img(path_to_img):
@@ -51,7 +51,6 @@ def load_img(path_to_img):
 def import_model(filepath: str):
     model_handle = filepath
     model = hub.load(model_handle)
-    #model = tf.keras.models.load_model(filepath)
     return model
 
 

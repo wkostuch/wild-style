@@ -1,9 +1,16 @@
 # wild-style
 Style transfer on images through machine learning.
 
-# Usage
+# Results
+Check out images/results for a sample of what the algorithm can produce!
+
+# Directions
 ## Installation
 Run the command pip install -r requirements.txt to install the required dependencies.
+
+## Usage
+To try it with your own images, edit the file paths for the content_path and style_path variables at the top of 
+base_demo.py to point to images in your own file system, then just run the file.
 
 # References
 ## Papers

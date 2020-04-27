@@ -25,9 +25,9 @@ End of imports
 
 
 #Get the file-paths for our images
-content_path = "../images/content/rome_waterfront.png"
-#style_path =  "../images/style/monet_haystacks.png"
-style_path = "../images/results/rome+starry_night.png"
+content_path = "../images/content/texas_sky.png"
+style_path =  "../images/style/starry_night.png"
+# style_path = "../images/results/rome+starry_night.png"
 
 #Load the image into a tensor
 def load_img(path_to_img):
@@ -247,8 +247,8 @@ image = tf.Variable(content_image)
 
 start = time.time()
 
-epochs = 20
-steps_per_epoch = 10
+epochs = 10
+steps_per_epoch = 100
 total_steps = epochs * steps_per_epoch
 
 #Run the picture through the styling method a bunch of times

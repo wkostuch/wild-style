@@ -3,6 +3,7 @@
 # All necessary Python packages are included in the requirements.txt file in 
 # the root directory of the repository.
 import cv2
+import math
 import method_library as meth
 import numpy as np
 import tensorflow as tf
@@ -91,6 +92,38 @@ def zoom_center(img, height, width):
     return crop_img
 
 
+# Helper function for rand_rotate.
+def get_p(center, corner_dist, upper_left, alpha):
+    """Find the intersection point of the top of the rotated image and the
+    diagonal of the original image.
+    """
+
+    phi = math.degrees(math.asin(center[1] / center[0]))
+    theta = phi - alpha
+    p_dist = center[0] / math.cos(theta)
+    p_y = center[0] + ((upper_left[0] - center[0]) * (p_dist // corner_dist))
+    p_x = center[1] + ((upper_left[1] - center[1]) * (p_dist // corner_dist))
+    p = (p_y, p_x)
+
+    return (p_dist, p)
+
+
+# Helper function for rand_rotate.
+def get_q(center, corner_dist, upper_right, alpha):
+    """Find the intersection point of the right of the rotated image and the
+    diagonal of the original image.
+    """
+
+    phi = math.degrees(math.asin(center[0] / center[1]))
+    theta = phi - alpha
+    q_dist = center[1] / math.cos(theta)
+    q_y = center[1] + ((upper_right[1] - center[1]) * (q_dist // corner_dist))
+    q_x = center[0] + ((upper_right[0] - center[0]) * (q_dist // corner_dist))
+    q = (q_y, q_x)
+
+    return (q_dist, q)
+
+
 # Performs a random rotation on the input image.
 def rand_rotate(img, height, width):
     """Rotates an image by a random amount.
@@ -106,16 +139,37 @@ def rand_rotate(img, height, width):
 
     # Get the rotation matrix for the required affine transform
     center = (height // 2, width // 2)
-    angle = random.randint(1, 360)
-    rot_mat = cv2.getRotationMatrix2D(center, angle, 1.0)
+    alpha = random.randint(1, 360)
+    rot_mat = cv2.getRotationMatrix2D(center, alpha, 1.0)
 
     # Rotate the image
     rot_img = cv2.warpAffine(img, rot_mat, (height, width))
 
-    # Zoom in on the center of the image to hopefully crop out unwanted blank
-    # space left on the edges after rotation.
-    # TODO: Find a better way to get rid of blank space after rotation.
-    rot_img = zoom_center(img, height, width)
+    # Crop the image so that there is no blank space.  Thanks to Rob Hochberg
+    # for the solution to the bounding rectangle problem here.
+    # Coordinates are given in (y, x) because that's how OpenCV handles
+    # coordinates.
+    # Find the two points where the edges of the rotated image intersect the
+    # diagonals of the original image rectangle, then keep the one closer to
+    # the center.
+    corner_dist = math.sqrt((center[0] ** 2) + (center[1] ** 2))
+    upper_left = (0, 0)
+    upper_right = (0, width)
+
+    p_tuple = get_p(center, corner_dist, upper_left, alpha)
+    q_tuple = get_q(center, corner_dist, upper_right, alpha)
+
+    # Pick the point closer to the center and get its rectangle.
+    point = min([p_tuple, q_tuple])[1]
+    bound_height = (center[0] - point[0]) * 2
+    bound_width = (center[1] - point[1]) * 2
+    corners_y = [point[0], point[0] + bound_height]
+    corners_y.sort()
+    corners_x = [point[1] + bound_width]
+    corners_x.sort()
+    
+    rot_img = rot_img[corners_y[0]:corners_y[1], corners_x[0]:corners_x[1], :]
+    rot_img = cv2.resize(rot_img, (height, width))
 
     return rot_img
 
@@ -241,7 +295,7 @@ def augment_style(img):
 
 
 # Performs preprocessing on the content image and the style image.
-def preprocess(content, style):
+def augment(content, style):
     """Pre-processes the content and style images.
 
     Parameters
@@ -251,6 +305,8 @@ def preprocess(content, style):
     Returns
     - (proc_content, proc_style): tuple of the processed style and content 
     images
+    - proc_content is a single image
+    - proc_style is a tuple of images
 
     The content image is preprocessed by converting the image to grayscale, then
     duplicating that grayscale image across all three image channels, ensuring
@@ -265,11 +321,14 @@ def preprocess(content, style):
 
     # Conver the content image to 3 channels of grayscale.
     proc_content = gray_content(content)
+    proc_style = augment_style(style)
+
+    return (proc_content, proc_style)
 
 
-def main():
+def test():
     return
 
 
 if __name__ == "__main__":
-    main()
+    test()

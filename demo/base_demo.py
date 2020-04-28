@@ -25,8 +25,8 @@ End of imports
 
 
 #Get the file-paths for our images
-content_path = "../images/content/texas_sky.png"
-style_path =  "../images/style/starry_night.png"
+content_path = "../images/content/beer_in_budapest.png"
+style_path =  "../images/style/caravaggio_the_calling.png"
 # style_path = "../images/results/rome+starry_night.png"
 
 #Load the image into a tensor
@@ -205,8 +205,8 @@ def clip_0_1(image):
 optimizer = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
 
 
-style_weight=1e-2
-content_weight=1e4
+style_weight=1e-3
+content_weight=1e5
 
 
 def style_content_loss(outputs):

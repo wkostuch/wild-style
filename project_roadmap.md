@@ -20,6 +20,11 @@
 * Fold pretrained more closely into the codebase.
   * Eliminate the need for dowloading VGG19 weights before running the code.
   * Get a locally-based copy of the model for fast style transfer.
+* Refactor base_demo.py into a class.
+  * Constructor takes content image path and style image path
+  * State is the result image.  Running the image through a processing step updates the state.
+  * Public member function to train and update the result given parameters for training steps and style/content weights.
+  * Public member function to return whatever the result image is right now.
    
 
 ## Down the Road

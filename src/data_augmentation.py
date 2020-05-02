@@ -240,6 +240,9 @@ def __rand_rotate(img, height, width):
     rot_img = __rotate_image(img, angle)
     rot_crop_img = __crop_around_center(rot_img,\
         *__largest_rotated_rect(width, height, math.radians(angle)))
+    
+    # Resize the image to the shape of the input.
+    rot_crop_img = cv2.resize(rot_crop_img, (width, height))
 
     return rot_crop_img
 

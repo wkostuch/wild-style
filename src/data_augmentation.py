@@ -1,12 +1,12 @@
+# Author: Michael Jurkoic
+
 # Based on the research from this paper: https://www.mdpi.com/2071-1050/11/20/5673/htm
 
 # All necessary Python packages are included in the requirements.txt file in 
 # the root directory of the repository.
 import cv2
 import math
-import method_library as meth
 import numpy as np
-import tensorflow as tf
 import random
 
 

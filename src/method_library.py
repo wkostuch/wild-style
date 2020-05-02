@@ -59,6 +59,25 @@ def tensor_to_image(tensor):
     return Image.fromarray(tensor)
 
 
+# Converts an OpenCV image into a tensor.
+def cv2_image_to_tensor(img):
+    """
+    Convert an OpenCV image into a TensorFlow tensor.
+
+    Parameters
+    - image (cv2 image): 3-color BGR image.
+
+    Returns
+    - tensor: 3-color RGB tensor.
+    """
+
+    # Convert the BGR image to RGB
+    rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # Convert the RGB OpenCV image to a tensor.
+    tensor = tf.convert_to_tensor(img)
+    return tensor
+
+
 #Takes an image-tensor, makes it displayable, and displays it via Pillow
 def imshow(image, title=None):
     """

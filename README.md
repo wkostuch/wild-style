@@ -10,23 +10,21 @@ spectacular results:
 
 ## Images
 ### A Texas Starry Night
-A Texas landscape rendered in the style of Van Gogh's "Starry Night"
+A Texas landscape rendered in the style of Van Gogh's "Starry Night".
 > ![Texas Starry Night](https://github.com/wkostuch/wild-style/blob/master/images/results/texas_starry_night.png)
 
 ### Lakeside + Parable of the Sower
-A lakeside 
+A lakeside combined with The Parable of the Sower produces a quite painterly
+vista.
 > ![Lakeside](https://github.com/wkostuch/wild-style/blob/master/images/content/lakeside.png),
-combined with The Parable of the Sower 
 > ![The Parable of the Sower](https://github.com/wkostuch/wild-style/blob/master/images/style/parable_of_sower.png),
-produces this painterly vista:
 > ![Lakeside + Parable of the Sower](https://github.com/wkostuch/wild-style/blob/master/images/results/lake%2Bparable_of_sower.png)
 
 ### Dog + Girl With a Mandolin
-A dog
+A dog rendered in the style of Picasso's "Girl with a Mandolin" produces a 
+distinctly cubist dog.
 > ![Dog](https://github.com/wkostuch/wild-style/blob/master/images/content/dog.png)
-rendered in the style of Picasso's "Girl with a Mandolin"
 > ![Girl with a Mandolin](https://github.com/wkostuch/wild-style/blob/master/images/style/girl_with_mandolin.png)
-produces a distinctly cubist dog:
 > ![Cubist dog](https://github.com/wkostuch/wild-style/blob/master/images/results/picasso_dog_3.png)
 
 # Results

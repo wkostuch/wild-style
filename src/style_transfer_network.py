@@ -1,6 +1,10 @@
 # Author: Michael Jurkoic
 
-# Based on this paper: https://www.mdpi.com/2071-1050/11/20/5673/htm
+# Based on this paper by Zhou, et. al.: 
+# https://www.mdpi.com/2071-1050/11/20/5673/htm
+
+# Special thanks to Dr. Rob Hochberg for help understanding the contents of the
+# paper.
 
 # All necessary Python packages are included in the requirements.txt file in 
 # the root directory of the repository.

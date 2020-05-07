@@ -248,7 +248,7 @@ def __rand_rotate(img, height, width):
 
 
 # Flips an image over one of its axes
-def __rand_flip(img):
+def __rand_flip(img, height, width):
     """Flips an image over either its horizontal or vertical axis.
 
     Parameters
@@ -334,15 +334,14 @@ def __perturb(img, height, width):
 
 
 # Performs data augmentation on the style image.
-# TODO: consider adding more rotations to the output.
-def __augment_style(img):
+def __augment_style(img, num_imgs):
     """Perform data augmentation on an image.
 
     Parameters
     - img (cv2 color image): 3-channel color image
 
     Returns
-    - tuple: 6-tuple containing the augmented images
+    - augmented_imgs (list): list of length num of random augmentations.
 
     Perform data augmentation on the input image with a series of image
     transformations.  These transformations include zooming in on the original
@@ -356,15 +355,30 @@ def __augment_style(img):
     height = dims[0]
     width = dims[1]
 
-    # Get a separate image for each augmentation transformation.
-    zoom_img = __zoom_center(img, height, width)
-    rot_img = __rand_rotate(img, height, width)
-    flip_img = __rand_flip(img)
-    occlude_img = __rand_occlude(img)
-    perturb_img = __perturb(img, height, width)
+    augmentation_funcs = [__zoom_center, __rand_flip, __rand_rotate,\
+        __rand_occlude, __perturb]
+    # Store augmented images in here.  Length is given by num_imgs parameter.
+    augmented_imgs = [None for i in range(num_imgs)]
+    # Include the original image in the list.
+    augmented_imgs[0] = img
 
-    # Return a tuple of all 5 augmented images and the original.
-    return (img, zoom_img, rot_img, flip_img, occlude_img, perturb_img)
+    # Run the image through three randomly chosen augmentation functions, and do
+    # it num_imgs times.
+    for i in range(1, num_imgs):
+        functions = [random.randint(len(augmentation_funcs)) for j in range(3)]
+        mut_img = img
+        mut_height, mut_width = mut_img.shape[0], mut_img.shape[1]
+        mut_img = augmentation_funcs[functions[0]](mut_img, height, width)
+        mut_height, mut_width = mut_img.shape[0], mut_img.shape[1]
+        mut_img = augmentation_funcs[functions[1]](mut_img, mut_height,\
+            mut_width)
+        mut_height, mut_width = mut_img.shape[0], mut_img.shape[1]
+        mut_img = augmentation_funcs[functions[2]](mut_img, mut_height,\
+            mut_width)
+        augmented_imgs[i] = mut_img
+
+    # Return a list of num_imgs augmented images.
+    return augmented_imgs
 
 
 # Performs preprocessing on the content image and the style image.

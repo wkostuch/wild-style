@@ -32,6 +32,9 @@
 * Do style transfer in real-time with video.
 * Do style transfer on specific objects in the image, while preserving the rest of the image.
 * Unify under a single user interface (graphical or command line)
+* Experiment with separating foreground and background styles to achieve a better results with Renaissance styles.
+  * This model might be helpful: https://github.com/NathanUA/U-2-Net
+  * Credit to Michael Booton for the suggestion.
 
 
 # Android App Feature List

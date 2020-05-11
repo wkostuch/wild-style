@@ -205,8 +205,8 @@ def clip_0_1(image):
 optimizer = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
 
 
-style_weight=1e-2
-content_weight=1e4
+style_weight=1e-3
+content_weight=1e5
 
 
 def style_content_loss(outputs):

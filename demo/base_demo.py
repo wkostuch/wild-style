@@ -25,8 +25,8 @@ End of imports
 
 
 #Get the file-paths for our images
-content_path = "../images/content/texas_sky.png"
-style_path =  "../images/style/starry_night.png"
+content_path = "../images/content/ud_capp_patio.png"
+style_path =  "../images/style/neon_city.png"
 # style_path = "../images/results/rome+starry_night.png"
 
 #Load the image into a tensor
@@ -247,18 +247,25 @@ image = tf.Variable(content_image)
 
 start = time.time()
 
-epochs = 10
-steps_per_epoch = 100
+epochs = 20
+steps_per_epoch = 30
 total_steps = epochs * steps_per_epoch
+
+file_path = "../images/results/"
+file_name = file_path + "UD_neon.png"
 
 #Run the picture through the styling method a bunch of times
 step = 0
 for n in range(epochs):
-  for m in range(steps_per_epoch):
-    step += 1
-    train_step(image)
+    file_name = file_path + "UD_neon"
+    for m in range(steps_per_epoch):
+        step += 1
+        train_step(image)
+    file_name += "_" + str(n) + ".png"
+    img = tensor_to_image(image)
+    img.save(file_name, "PNG")
   #display.clear_output(wait=True)
-  print("Train step: {} out of {}".format(step, total_steps))
+    print("Train step: {} out of {}".format(step, total_steps))
 
 end = time.time()
 print("Total time: {:.1f}".format(end-start))
@@ -278,7 +285,7 @@ save_answers = ["y", "Y", "Yes", "yes", "ye", "Ye"]
 do_not_save_answers = ["n", "N", "No", "no"]
 
 file_path = "../images/results/"
-file_name = file_path + "rome+haystacks_150_steps.png"
+file_name = file_path + "neon_ud.png"
 while(True):
     answer = input("Would you like to save this picture? (y/n): ")
     # Case for: invalid input.

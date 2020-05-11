@@ -25,8 +25,8 @@ End of imports
 
 
 #Get the file-paths for our images
-content_path = "../images/content/ud_capp_patio.png"
-style_path =  "../images/style/neon_city.png"
+content_path = "../images/content/lakeside.png"
+style_path =  "../images/style/parable_of_sower.png"
 # style_path = "../images/results/rome+starry_night.png"
 
 #Load the image into a tensor
@@ -252,12 +252,12 @@ steps_per_epoch = 30
 total_steps = epochs * steps_per_epoch
 
 file_path = "../images/results/"
-file_name = file_path + "UD_neon.png"
+file_name = file_path + "lakeside_sower.png"
 
 #Run the picture through the styling method a bunch of times
 step = 0
 for n in range(epochs):
-    file_name = file_path + "UD_neon"
+    file_name = file_path + "lakeside_sower"
     for m in range(steps_per_epoch):
         step += 1
         train_step(image)

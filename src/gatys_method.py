@@ -183,8 +183,9 @@ class GatysNeuralStyleTransfer():
         meth.display_tensor_as_image(self.style_image_tensor)
 
     @tf.function()
-    def style_step(self, image):
+    def style_step(self):
         """Styles the image one increment."""
+        image = self.transfer_image_tensor
         with tf.GradientTape() as tape:
             outputs = self.extractor(image)
             loss = self.style_content_loss(outputs)
@@ -193,7 +194,13 @@ class GatysNeuralStyleTransfer():
         grad = tape.gradient(loss, image)
         self.optimizer.apply_gradients([(grad, image)])
         image.assign(clip_0_1(image))
-        self.style_transfer_steps += 1
+    
+    def style_n_times(self, num_times_to_style: int):
+        """Runs style(step) on the transfer_image num_times_to_style times."""
+        for i in range(num_times_to_style):
+            self.style_step()
+        self.style_transfer_steps += num_times_to_style
+        
 
     def style_content_loss(self, outputs):
         """Returns the total loss for style transferral."""
@@ -223,9 +230,7 @@ End of GatysNeuralStyleTransfer class
 content_path = "../images/content/lakeside.png"
 style_path =  "../images/style/parable_of_sower.png"
 transfer = GatysNeuralStyleTransfer(content_path, style_path)
-for i in range(10):
-    print(i)
-    transfer.style_step(transfer.transfer_image_tensor)
+transfer.style_n_times(10)
 transfer.show_content_image()
 transfer.show_style_image()
 transfer.show_currently_styled_image()

@@ -41,7 +41,39 @@ def import_image(path):
     return img
 
 
-#Takes a tensor and returns one that can be displayed via Pillow
+# Loads and image into a tensor
+def load_img_as_tensor(path_to_img, dimension=512):
+    """Loads the image from the given filepath as a tensor object.
+
+    Parameters:
+    - path_to_img (string): Filepath to an image
+    - dimension (int): Maximum size of the largest side of the image (default: 512)
+
+    Returns:
+    - tensor
+
+    Supported file types for loading images:
+    - .png
+    """
+    max_dim = dimension
+    # Read the image into a tensor
+    img = tf.io.read_file(path_to_img)
+    img = tf.image.decode_image(img, channels=3)
+    img = tf.image.convert_image_dtype(img, tf.float32)
+
+    # Compute new dimensions for the image
+    shape = tf.cast(tf.shape(img)[:-1], tf.float32)
+    long_dim = max(shape)
+    scale = max_dim / long_dim
+    new_shape = tf.cast(shape * scale, tf.int32)
+
+    #Resize the image-tensor
+    img = tf.image.resize(img, new_shape)
+    img = img[tf.newaxis, :]
+    return img
+
+
+# Takes a tensor and returns one that can be displayed via Pillow
 def tensor_to_image(tensor):
     """
     Transforms a tensor into one that can be dispalyed via Pillow
@@ -80,9 +112,10 @@ def cv2_image_to_tensor(img):
 
 
 #Takes an image-tensor, makes it displayable, and displays it via Pillow
-def imshow(image, title=None):
+def display_tensor_as_image(image, title=None):
     """
-    Takes a tensor and displays it as an image.
+    Takes a tensor and displays it as an image using the system's
+    default image-viewer.
 
     Note: this method calls tensor_to_image, so you don't have to
           preprocess by calling that on the tensor before giving

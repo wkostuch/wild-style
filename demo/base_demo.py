@@ -77,11 +77,15 @@ imshow(content_image, title='Content Image')
 
 imshow(style_image, title='Style Image')
 
-
+'''
+Testing the TF Hub stuff
 hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/1')
+
 stylized_image = hub_module(tf.constant(content_image), tf.constant(style_image))[0]
 tensor_to_image(stylized_image)
+'''
 
+''' Test to make sure VGG got in properly
 x = tf.keras.applications.vgg19.preprocess_input(content_image*255)
 x = tf.image.resize(x, (224, 224))
 vgg = tf.keras.applications.VGG19(include_top=True, weights='imagenet')
@@ -90,7 +94,7 @@ prediction_probabilities.shape
 
 predicted_top_5 = tf.keras.applications.vgg19.decode_predictions(prediction_probabilities.numpy())[0]
 [(class_name, prob) for (number, class_name, prob) in predicted_top_5]
-
+'''
 vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
 
 print()
@@ -176,7 +180,7 @@ extractor = StyleContentModel(style_layers, content_layers)
 results = extractor(tf.constant(content_image))
 
 style_results = results['style']
-
+'''
 print('Styles:')
 for name, output in sorted(results['style'].items()):
     print("  ", name)
@@ -193,7 +197,7 @@ for name, output in sorted(results['content'].items()):
     print("    min: ", output.numpy().min())
     print("    max: ", output.numpy().max())
     print("    mean: ", output.numpy().mean())
-
+'''
 style_targets = extractor(style_image)['style']
 content_targets = extractor(content_image)['content']
 
@@ -263,7 +267,7 @@ for n in range(epochs):
         train_step(image)
     file_name += "_" + str(n) + ".png"
     img = tensor_to_image(image)
-    img.save(file_name, "PNG")
+    #img.save(file_name, "PNG")
   #display.clear_output(wait=True)
     print("Train step: {} out of {}".format(step, total_steps))
 

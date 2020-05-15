@@ -13,7 +13,7 @@ import tensorflow as tf
 
 
 # Define the content loss function (equation 5 in the Zhou paper).
-def _compute_content_loss(content_img, stylized_img):
+def _content_loss(content_img, stylized_img):
     """
     Compute the content loss between the content image and the stylized image.
 

@@ -107,7 +107,7 @@ def cv2_image_to_tensor(img):
     # Convert the BGR image to RGB
     rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # Convert the RGB OpenCV image to a tensor.
-    tensor = tf.convert_to_tensor(rgb_img, dtype='int32')
+    tensor = tf.convert_to_tensor(rgb_img, dtype='float32')
     return tensor
 
 

@@ -13,7 +13,7 @@ import tensorflow as tf
 
 
 # Define the content loss function (equation 5 in the Zhou paper).
-def __compute_content_loss(content_img, stylized_img):
+def _compute_content_loss(content_img, stylized_img):
     """
     Compute the content loss between the content image and the stylized image.
 
@@ -35,3 +35,26 @@ def __compute_content_loss(content_img, stylized_img):
     content_loss = diff_norm.numpy() / tf.reduce_prod(content_img.shape).numpy()
     
     return content_loss
+
+
+# Define the function that computes the Gram matrix.  According to the Zhou
+# paper, the Gram matrix reflects the general style of the image, and is useful
+# for comparing style features.
+def _gram_matrix(image):
+    """
+    Compute the Gram matrix of the given image.
+
+    Parameters
+    - image (tensor): An image activated by the VGG19 network.
+
+    Returns
+    - gram (tensor): Gram matrix of the input image.
+
+    This function implements equation 6 in the Zhou paper.  The Gram matrix is a
+    good representation of an image's style, and is here used as a feature
+    extractor.
+    """
+
+    # Use einsum to compute the Gram matrix.
+    gram = tf.einsum('ijc,ijd->cd', image, image)
+    return gram

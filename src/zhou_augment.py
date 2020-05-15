@@ -8,10 +8,12 @@ import cv2
 import math
 import numpy as np
 import random
+import unittest
 
 
-def __phys_form(pix):
-    """Converts a single pixel in a 3-channel image to three identical gray
+def _phys_form(pix):
+    """
+    Converts a single pixel in a 3-channel image to three identical gray
     channels.
 
     Parameters
@@ -39,8 +41,9 @@ def __phys_form(pix):
 # Takes the content image and turns it into a gray image.
 # Graying the content image helps prevent the color mixing that occurs in the
 # classic Gatys style transfer algorithm.
-def __gray_content(img):
-    """Converts an image into grayscale.
+def _gray_content(img):
+    """
+    Converts an image into grayscale.
 
     Parameters
     - img (cv2 image): 3-channel color image
@@ -60,15 +63,16 @@ def __gray_content(img):
     # Cycle through every pixel in the image, and replace all three channels
     # with their grayscale equivalents.
     for i in range(len(img)):
-        img[i] = [__phys_form(pix) for pix in img[i]]
+        img[i] = [_phys_form(pix) for pix in img[i]]
 
     return img
 
 
 # Zooms in on the center of an image, and returns the zoomed portion at the
 # original dimensions of the input.
-def __zoom_center(img, height, width):
-    """Zooms in on the center of the given image.
+def _zoom_center(img, height, width):
+    """
+    Zooms in on the center of the given image.
 
     Parameters
     - img (cv2 image): 3-channel color image
@@ -78,9 +82,9 @@ def __zoom_center(img, height, width):
     Returns
     - cv2 image: centered zoom on img cropped to dimensions (height, width)
     """
-    # Upsample the image to double the size of the original.
-    # This is effectively x2 zoom.
-    large_img = cv2.pyrUp(img)
+    # Resize the image to twice the original size.
+    large_img = cv2.resize(img, (width*2, height*2),\
+        interpolation=cv2.INTER_CUBIC)
 
     # Crop the image to the same size as the input.
     vert_crop = height // 2
@@ -91,9 +95,9 @@ def __zoom_center(img, height, width):
     return crop_img
 
 
-# __rotate_image, __largest_rotated_rect, and __crop_around_center come from
+# _rotate_image, _largest_rotated_rect, and _crop_around_center come from
 # this StackOverflow thread: https://stackoverflow.com/questions/16702966/rotate-image-and-crop-out-black-borders/16778797#16778797
-def __rotate_image(image, angle):
+def _rotate_image(image, angle):
     """
     Rotates an OpenCV 2 / NumPy image about it's centre by the given angle
     (in degrees). The returned image will be large enough to hold the entire
@@ -110,7 +114,7 @@ def __rotate_image(image, angle):
         [cv2.getRotationMatrix2D(image_center, angle, 1.0), [0, 0, 1]]
     )
 
-    rot_mat_notranslate = np.matrix(rot_mat[0:2, 0:2])
+    rot_mat_notranslate = np.array(rot_mat[0:2, 0:2])
 
     # Shorthand for below calcs
     image_w2 = image_size[0] * 0.5
@@ -118,10 +122,10 @@ def __rotate_image(image, angle):
 
     # Obtain the rotated coordinates of the image corners
     rotated_coords = [
-        (np.array([-image_w2,  image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([ image_w2,  image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([-image_w2, -image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([ image_w2, -image_h2]) * rot_mat_notranslate).A[0]
+        (np.array([-image_w2,  image_h2]) * rot_mat_notranslate)[0],
+        (np.array([ image_w2,  image_h2]) * rot_mat_notranslate)[0],
+        (np.array([-image_w2, -image_h2]) * rot_mat_notranslate)[0],
+        (np.array([ image_w2, -image_h2]) * rot_mat_notranslate)[0]
     ]
 
     # Find the size of the new image
@@ -142,14 +146,14 @@ def __rotate_image(image, angle):
     new_h = int(abs(top_bound - bot_bound))
 
     # We require a translation matrix to keep the image centred
-    trans_mat = np.matrix([
+    trans_mat = np.array([
         [1, 0, int(new_w * 0.5 - image_w2)],
         [0, 1, int(new_h * 0.5 - image_h2)],
         [0, 0, 1]
     ])
 
     # Compute the tranform for the combined rotation and translation
-    affine_mat = (np.matrix(trans_mat) * np.matrix(rot_mat))[0:2, :]
+    affine_mat = (np.array(trans_mat) * np.array(rot_mat))[0:2, :]
 
     # Apply the transform
     result = cv2.warpAffine(
@@ -162,7 +166,7 @@ def __rotate_image(image, angle):
     return result
 
 
-def __largest_rotated_rect(w, h, angle):
+def _largest_rotated_rect(w, h, angle):
     """
     Given a rectangle of size wxh that has been rotated by 'angle' (in
     radians), computes the width and height of the largest possible
@@ -198,7 +202,7 @@ def __largest_rotated_rect(w, h, angle):
     )
 
 
-def __crop_around_center(image, width, height):
+def _crop_around_center(image, width, height):
     """
     Given a NumPy / OpenCV 2 image, crops it to the given width and height,
     around it's centre point
@@ -222,8 +226,10 @@ def __crop_around_center(image, width, height):
 
 
 # Performs a random rotation on the input image.
-def __rand_rotate(img, height, width):
-    """Rotates an image by a random amount.
+# TODO: Fix this to return an image of the same shape as the input.
+def _rand_rotate(img, height, width):
+    """
+    Rotates an image by a random amount.
 
     Parameters
     - img (cv2 image): 3-channel color image
@@ -235,12 +241,10 @@ def __rand_rotate(img, height, width):
     """
 
     # Get the rotation matrix for the required affine transform
-    center = (height // 2, width // 2)
     angle = random.randint(1, 360)
-    rot_img = __rotate_image(img, angle)
-    rot_crop_img = __crop_around_center(rot_img,\
-        *__largest_rotated_rect(width, height, math.radians(angle)))
-    
+    rot_img = _rotate_image(img, angle)
+    rot_crop_img = _crop_around_center(rot_img,\
+        *_largest_rotated_rect(width, height, math.radians(angle)))
     # Resize the image to the shape of the input.
     rot_crop_img = cv2.resize(rot_crop_img, (width, height))
 
@@ -248,8 +252,9 @@ def __rand_rotate(img, height, width):
 
 
 # Flips an image over one of its axes
-def __rand_flip(img, height, width):
-    """Flips an image over either its horizontal or vertical axis.
+def _rand_flip(img, height, width):
+    """
+    Flips an image over either its horizontal or vertical axis.
 
     Parameters
     - img (cv2 image): 3-channel color image
@@ -272,8 +277,9 @@ def __rand_flip(img, height, width):
 # Much like zoom_center, but zooms in on a corner of the image rather than the
 # center.
 # TODO: See if rand_occlude and zoom_center can be merged.
-def __rand_occlude(img, height, width):
-    """Zoom in on a corner of an image, occluding the remainder.
+def _rand_occlude(img, height, width):
+    """
+    Zoom in on a corner of an image, occluding the remainder.
 
     Parameters
     - img (cv2 image): 3-channel color image
@@ -290,10 +296,9 @@ def __rand_occlude(img, height, width):
     # 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
     rand_corner = random.randint(1, 5)
 
-    # Upsample the image to double the size of the original.
-    # This is effectively x2 zoom.
-    large_img = cv2.pyrUp(img)
-
+    # Resize the image to twice the original dimensions.
+    large_img = cv2.resize(img, (width*2, height*2),\
+        interpolation=cv2.INTER_CUBIC)
     large_dims = large_img.shape
     
     # Slice out the required part of the image
@@ -312,8 +317,9 @@ def __rand_occlude(img, height, width):
 
 
 # Adds random noise to an image
-def __perturb(img, height, width):
-    """Add random noise to an image.
+def _perturb(img, height, width):
+    """
+    Add random noise to an image.
 
     Parameters
     - img (cv2 image): 3-channel color image
@@ -325,17 +331,22 @@ def __perturb(img, height, width):
     """
 
     # Initialize an 'image' of the same shape as the input.
-    noise = [[0 for i in range(width)] for j in range(height)]
-    cv2.randn(noise, 0, 0.1)
+    noise = np.array([[0 for i in range(width)] for j in range(height)], )
+    cv2.randn(noise, 0, 10)
 
-    noisy_img = img + noise
+    b, g, r = cv2.split(img)
+    b = b + noise
+    g = g + noise
+    r = r + noise
+    noisy_img = cv2.merge([r, g, b])
 
     return noisy_img
 
 
 # Performs data augmentation on the style image.
-def __augment_style(img, num_imgs):
-    """Perform data augmentation on an image.
+def _augment_style(img, num_imgs):
+    """
+    Perform data augmentation on an image.
 
     Parameters
     - img (cv2 color image): 3-channel color image
@@ -355,8 +366,10 @@ def __augment_style(img, num_imgs):
     height = dims[0]
     width = dims[1]
 
-    augmentation_funcs = [__zoom_center, __rand_flip, __rand_rotate,\
-        __rand_occlude, __perturb]
+    img = img.astype("float32")
+
+    augmentation_funcs = [_zoom_center, _rand_flip, _rand_rotate,\
+        _rand_occlude, _perturb]
     # Store augmented images in here.  Length is given by num_imgs parameter.
     augmented_imgs = [None for i in range(num_imgs)]
     # Include the original image in the list.
@@ -365,15 +378,13 @@ def __augment_style(img, num_imgs):
     # Run the image through three randomly chosen augmentation functions, and do
     # it num_imgs times.
     for i in range(1, num_imgs):
-        functions = [random.randint(len(augmentation_funcs)) for j in range(3)]
         mut_img = img
         mut_height, mut_width = mut_img.shape[0], mut_img.shape[1]
-        mut_img = augmentation_funcs[functions[0]](mut_img, height, width)
-        mut_height, mut_width = mut_img.shape[0], mut_img.shape[1]
-        mut_img = augmentation_funcs[functions[1]](mut_img, mut_height,\
+        mut_img = augmentation_funcs[random.randint(0, 4)](mut_img, height,\
+            width)
+        mut_img = augmentation_funcs[random.randint(0, 4)](mut_img, mut_height,\
             mut_width)
-        mut_height, mut_width = mut_img.shape[0], mut_img.shape[1]
-        mut_img = augmentation_funcs[functions[2]](mut_img, mut_height,\
+        mut_img = augmentation_funcs[random.randint(0, 4)](mut_img, mut_height,\
             mut_width)
         augmented_imgs[i] = mut_img
 
@@ -382,12 +393,14 @@ def __augment_style(img, num_imgs):
 
 
 # Performs preprocessing on the content image and the style image.
-def augment(content, style):
-    """Pre-processes the content and style images.
+def augment(content, style, num_style_imgs):
+    """
+    Pre-processes the content and style images.
 
     Parameters
     - content (cv2 color image): content image
     - style (cv2 color image): style image
+    - num_style_img (int): number of style image augmentations to return.
 
     Returns
     - (proc_content, proc_style): tuple of the processed style and content 
@@ -407,26 +420,7 @@ def augment(content, style):
     """
 
     # Conver the content image to 3 channels of grayscale.
-    proc_content = __gray_content(content)
-    proc_style = __augment_style(style)
+    proc_content = _gray_content(content)
+    proc_style = _augment_style(style, num_style_imgs)
 
     return (proc_content, proc_style)
-
-
-def test():
-    # Test image rotation.
-    pre_rot_img = cv2.imread("../images/style/starry_night.png",\
-        cv2.IMREAD_COLOR)
-    cv2.imshow("Style Image", pre_rot_img)
-    rot_img = __rand_rotate(pre_rot_img, pre_rot_img.shape[0],\
-        pre_rot_img.shape[1])
-    # try:
-    #     assert rot_img.shape == pre_rot_img.shape
-    # except AssertionError:
-    #     print("Output of rand_rotate is not the same shape as input.")
-    cv2.imshow("Rotated", rot_img)
-    cv2.waitKey()
-
-
-if __name__ == "__main__":
-    test()

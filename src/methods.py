@@ -107,7 +107,7 @@ def cv2_image_to_tensor(img):
     # Convert the BGR image to RGB
     rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # Convert the RGB OpenCV image to a tensor.
-    tensor = tf.convert_to_tensor(img)
+    tensor = tf.convert_to_tensor(rgb_img)
     return tensor
 
 
@@ -145,7 +145,7 @@ def closest_valid_size(input_dim):
     sizes = {"1":256, "2":512, "3":1024}
     size_dists = []
     for i in range(1, 4):
-        size_dists.append(abs(sizes(str(i)) - input_dim))
+        size_dists.append(abs(sizes[str(i)] - input_dim))
     closest_size = min(size_dists)
 
     return closest_size
@@ -183,7 +183,7 @@ def get_square_center(img, size=0):
 
     # Slice a square of the proper dimension out of the input, preserving the
     # number of input channels.
-    square_img = center[center[1]-edge_dist:center[1]+edge_dist,\
+    square_img = img[center[1]-edge_dist:center[1]+edge_dist,\
         center[0]-edge_dist:center[0]+edge_dist, :]
 
     # Determine the size of the output image.

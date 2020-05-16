@@ -36,6 +36,17 @@ class TestLossFunctions(unittest.TestCase):
         self.assertEqual(shape[0], 3)
         self.assertEqual(shape[1], 3)
 
+    # Make sure the style loss computation works.  Two identical images should
+    # have a style loss of 0.
+    def test_style_loss(self):
+        # Arrange
+        img = cv2.imread("../images/test/test_kitten.png", cv2.IMREAD_COLOR)
+        img_tensor = meth.cv2_image_to_tensor(img)
+        # Act
+        style_loss = loss._style_loss(img_tensor, img_tensor)
+        # Assert
+        self.assertEqual(style_loss, 0)
+
 
 def test():
     unittest.main()

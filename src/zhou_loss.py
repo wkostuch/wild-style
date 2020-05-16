@@ -58,3 +58,29 @@ def _gram_matrix(image):
     # Use einsum to compute the Gram matrix.
     gram = tf.einsum('ijc,ijd->cd', image, image)
     return gram
+
+
+# Define the style loss function (Zhou equation 7).
+def _style_loss(style_img, stylized_img):
+    """
+    Compute the style loss between two images.
+
+    Parameters
+    - style_img (tensor): The style image activated by VGG19.
+    - stylized_img (tensor): The image produced by the stylization network.
+
+    Returns
+    - style_loss (float): The output of the loss function.
+
+    This function implements equation 7 in the Zhou paper.
+    """
+
+    # Get the Euclidean distance between the Gram matrices of the two images.
+    style_img_gram = _gram_matrix(style_img)
+    stylized_img_gram = _gram_matrix(stylized_img)
+    diff = stylized_img_gram - style_img_gram
+    diff_norm = tf.norm(diff)**2
+    # Divide by the product of the dimensions of the input images.
+    style_loss = diff_norm.numpy() / tf.reduce_prod(style_img.shape).numpy()
+
+    return style_loss

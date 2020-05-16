@@ -38,12 +38,36 @@ class TestLossFunctions(unittest.TestCase):
 
     # Make sure the style loss computation works.  Two identical images should
     # have a style loss of 0.
-    def test_style_loss(self):
+    def test_layer_style_loss(self):
         # Arrange
         img = cv2.imread("../images/test/test_kitten.png", cv2.IMREAD_COLOR)
         img_tensor = meth.cv2_image_to_tensor(img)
         # Act
-        style_loss = loss._style_loss(img_tensor, img_tensor)
+        style_loss = loss._layer_style_loss(img_tensor, img_tensor)
+        # Assert
+        self.assertEqual(style_loss, 0)
+
+    # Do a simple test to make sure nothing is broken in the total loss
+    # computation.  The expected total style loss for two identical images here
+    # is 0.
+    def test_total_style_loss_with_default_weights(self):
+        # Arrange
+        img = cv2.imread("../images/test/test_kitten.png", cv2.IMREAD_COLOR)
+        img_tensor = meth.cv2_image_to_tensor(img)
+        # Act
+        style_loss = loss._total_style_loss([img_tensor], [img_tensor])
+        # Assert
+        self.assertEqual(style_loss, 0)
+
+    # Do a simple test to make sure nothing is broken in the total loss
+    # computation when the total loss function is passed custom weights.  The 
+    # expected total style loss for two identical images here is 0.
+    def test_total_style_loss_with_custom_weights(self):
+        # Arrange
+        img = cv2.imread("../images/test/test_kitten.png", cv2.IMREAD_COLOR)
+        img_tensor = meth.cv2_image_to_tensor(img)
+        # Act
+        style_loss = loss._total_style_loss([img_tensor], [img_tensor], [1.5])
         # Assert
         self.assertEqual(style_loss, 0)
 

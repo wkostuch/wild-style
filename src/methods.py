@@ -101,12 +101,12 @@ def cv2_image_to_tensor(img):
     - image (cv2 image): 3-color BGR image.
 
     Returns
-    - tensor: 3-color RGB tensor.
+    - tensor: 3-color RGB tensor of floats.
     """
     
     # Convert the BGR image to RGB
     rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    # Convert the RGB OpenCV image to a tensor.
+    # Convert the RGB OpenCV image to a tensor filled with floats.
     tensor = tf.convert_to_tensor(rgb_img, dtype='float32')
     return tensor
 

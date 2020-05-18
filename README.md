@@ -11,7 +11,7 @@ spectacular results:
 ## Images
 ### A Texas Starry Night
 A Texas landscape rendered in the style of Van Gogh's "Starry Night".
-> ![Texas Starry Night](https://github.com/wkostuch/wild-style/blob/master/images/results/texas_starry_night.png)
+> ![Texas Starry Night](https://github.com/wkostuch/wild-style/blob/master/images/results/Texas_night/texas_starry_night.png)
 
 ### Lakeside + Parable of the Sower
 A lakeside combined with The Parable of the Sower produces a quite painterly

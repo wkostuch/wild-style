@@ -71,6 +71,18 @@ class TestLossFunctions(unittest.TestCase):
         # Assert
         self.assertEqual(style_loss, 0)
 
+    # Make sure nothing is broken in the total variance loss computation.  It's
+    # hard to verify that the computed loss is correct, but make sure it returns
+    # a nonzero single number value.
+    def test_total_variance_loss(self):
+        # Arrange
+        img = cv2.imread("../images/test/test_kitten.png", cv2.IMREAD_COLOR)
+        img_tensor = meth.cv2_image_to_tensor(img)
+        # Act
+        tv_loss = loss._total_variance_loss(img_tensor)
+        # Assert
+        self.assertNotEqual(tv_loss, 0.0)
+
 
 def test():
     unittest.main()

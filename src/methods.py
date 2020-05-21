@@ -38,16 +38,18 @@ def import_image(path):
     # Import the image as a color image.
     img = cv2.imread(path, cv2.IMREAD_COLOR)
 
+
     return img
 
 
-# Loads and image into a tensor
+# Loads an image into a tensor
 def load_img_as_tensor(path_to_img, dimension=512):
     """Loads the image from the given filepath as a tensor object.
 
     Parameters:
     - path_to_img (string): Filepath to an image
-    - dimension (int): Maximum size of the largest side of the image (default: 512)
+    - dimension (int): Maximum size of the shortest side of the image (default:
+    512)
 
     Returns:
     - tensor
@@ -63,14 +65,35 @@ def load_img_as_tensor(path_to_img, dimension=512):
 
     # Compute new dimensions for the image
     shape = tf.cast(tf.shape(img)[:-1], tf.float32)
-    long_dim = max(shape)
+    short_dim = min(shape)
     scale = max_dim / long_dim
     new_shape = tf.cast(shape * scale, tf.int32)
 
-    #Resize the image-tensor
+    # Resize the image-tensor
     img = tf.image.resize(img, new_shape)
     img = img[tf.newaxis, :]
     return img
+
+
+# Takes a tensor and returns a square, centered slice of that tensor.
+def squarify_tensor(tensor):
+    """
+    Returns the a square, centered slice of the given tensor.
+
+    Parameters
+    - tensor: A 3D image tensor.
+    """
+
+    # Get the length of the shortest of the width/height dimensions.
+    shape = tf.cast(tf.shape(tensor)[2:], tf.float32)
+    short_side = min(shape)
+    radius = short_side // 2
+    # Find the center of the tensor.
+    center = [shape[0] // 2, shape[1] // 2]
+    # Slice out the square.
+    square_tensor = tensor[center[0]-radius:center[0]+radius,\
+        center[1]-radius:center[1]+radius, :]
+    return square_tensor
 
 
 # Takes a tensor and returns one that can be displayed via Pillow

@@ -13,7 +13,7 @@ from PIL import Image
 import time
 import functools
 import cv2
-import method_library as meth
+import methods as meth
 '''
 End of imports
 '''

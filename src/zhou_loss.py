@@ -199,7 +199,7 @@ def total_loss(content_image, content_stylized_image, style_images,\
     activated style images.  This list mus
     - simple_stylized_image (tensor): The unactivated stylized image; used to
     compute the total variance loss.
-    - loss_weights (tuple of floats): A 3-tuple of weights of the form (alpha, 
+    - total_loss_weights (tuple of floats): A 3-tuple of weights of the form (alpha, 
     beta, gamma) where alpha is the weight of the content loss, beta is the 
     weight of the style loss, and gamma is the weight of the total variance 
     loss.

@@ -31,60 +31,55 @@ class ResBlock(tf.keras.Model):
         return x
 
 
-# Builds the style transfer network, but doesn't train it.
-def build_model(output_activation='sigmoid'):
+class Stylizer(tf.keras.Model):
     """
-    Build the style transfer network initialized with random weights.
+    Custom Keras model for stylizing images.
 
-    Parameters
-    - output_activation (string): activation function to be used on the output
-    layer.  Defaults to sigmoid.
+    Constructor parameters
+    - ouput_activation (string): Activation function to be used on the output
+    layer.  Defaults to 'sigmoid'.
 
-    Returns
-    - style_model: TensorFlow Keras sequential CNN model.
-
-    Parameters for convolution layers are taken from Zhou et. al. (2019).
+    Layer parameters are those given by the Zhou paper.
     """
 
-    # Initialize a sequential model.
-    style_model = tf.keras.Sequential()
+    def __init__(self, output_activation='sigmoid', name='stylizer', **kwargs):
+        super(Stylizer, self).__init__(name=name, **kwargs)
+        # Define all the layers that will be needed.
+        # Each convolution and deconvolution layer is distinct.
+        self.conv1 = tf.keras.layers.Conv2D(filters=32, kernel_size=(9, 9),\
+            stride=1, activation='relu')
+        self.conv2 = tf.keras.layers.Conv2D(filters=64, kernel_size=(3, 3),\
+            stride=2, activation='relu')
+        self.conv3 = tf.keras.layers.Conv2D(filters=128, kernel_size=(3, 3),\
+            stride=2, activation='relu')
+        self.conv4 = tf.keras.layers.Conv2D(filters=3, kernel_stride=(9, 9),\
+            stride=1, activation='relu')
+        self.deconv1 = tf.keras.layers.Conv2DTranspose(filters=64,\
+            kernel_size=(3, 3), stride=2, activation='relu')
+        self.deconv2 = tf.keras.layers.Conv2DTranspose(filters=32,\
+            kernel_size=(3, 3), stride=2, activation='relu')
+        # All five res blocks are the same.
+        self.res_block = ResBlock(filters=128, kernel_size=(3, 3), stride=1)
+        # The same activation is reused several times.
+        self.activation = tf.keras.layers.Activation('relu')
+        # The output layer is given a custom activation function.
+        self.output = tf.keras.layers.Activation(output_activation)
 
-    # Add the first three convolution layers and activations.
-    # Conv1
-    style_model.add(tf.keras.layers.Conv2D(filters=32, kernel_size=(9, 9),\
-        stride=1))
-    style_model.add(tf.keras.layers.Activation('relu'))
-    # Conv2
-    style_model.add(tf.keras.layers.Conv2D(filters=64, kernel_size=(3, 3),\
-        stride=2))
-    style_model.add(tf.keras.layers.Activation('relu'))
-    # Conv2
-    style_model.add(tf.keras.layers.Conv2D(filters=128, kernel_size=(3, 3),\
-        stride=2))
-    style_model.add(tf.keras.layers.Activation('relu'))
-    # Res_block1
-    style_model.add(ResBlock(filters=128, kernel_size=(3, 3), stride=1))
-    # Res_block2
-    style_model.add(ResBlock(filters=128, kernel_size=(3, 3), stride=1))
-    # Res_block3
-    style_model.add(ResBlock(filters=128, kernel_size=(3, 3), stride=1))
-    # Res_block4
-    style_model.add(ResBlock(filters=128, kernel_size=(3, 3), stride=1))
-    # Res_block5
-    style_model.add(ResBlock(filters=128, kernel_size=(3, 3), stride=1))
-    # Deconv1
-    style_model.add(tf.keras.layers.Conv2DTranspose(filters=64,\
-        kernel_size=(3, 3), stride=2))
-    style_model.add(tf.keras.layers.Activation('relu'))
-    # Deconv2
-    style_model.add(tf.keras.layers.Conv2DTranspose(filters=32,\
-        kernel_size=(3, 3), stride=2))
-    style_model.add(tf.keras.layers.Activation('relu'))
-    # Conv4
-    style_model.add(tf.keras.layers.Conv2D(filters=3, kernel_stride=(9, 9),\
-        stride=1))
-    # Output layer activation.
-    # Changing the activation function will change the output image quality.
-    style_model.add(tf.keras.layers.Activation('sigmoid'))
-
-    return style_model
+    def call(self, x):
+        # First three convolution layers.
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        # Five Res_block layers.
+        x = self.res_block(x)
+        x = self.res_block(x)
+        x = self.res_block(x)
+        x = self.res_block(x)
+        x = self.res_block(x)
+        # Two deconvolution layers.
+        x = self.deconv1(x)
+        x = self.deconv2(x)
+        # One more convolution layer.
+        x = self.conv4(x)
+        # Output layer.
+        return self.output(x)

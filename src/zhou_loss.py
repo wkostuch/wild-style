@@ -196,12 +196,12 @@ def total_loss(content_image, content_stylized_image, style_images,\
     - style_images (list of tensors): A list of activations of the style image.
     - style_stylized_images (list of tensors): A list of activations of the
     generated stylized image activated by the same VGG19 layers as the 
-    activated style images.  This list mus
+    activated style images.
     - simple_stylized_image (tensor): The unactivated stylized image; used to
     compute the total variance loss.
-    - total_loss_weights (tuple of floats): A 3-tuple of weights of the form (alpha, 
-    beta, gamma) where alpha is the weight of the content loss, beta is the 
-    weight of the style loss, and gamma is the weight of the total variance 
+    - total_loss_weights (tuple of floats): A 3-tuple of weights of the form 
+    (alpha, beta, gamma) where alpha is the weight of the content loss, beta is 
+    the weight of the style loss, and gamma is the weight of the total variance 
     loss.
     - style_loss_weights (optional list of floats): An optional list of weights
     to be used in weighting the style loss computation.  The list must be the

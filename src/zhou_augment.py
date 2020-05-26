@@ -406,7 +406,7 @@ def augment(content, style, num_style_imgs):
     - (proc_content, proc_style): tuple of the processed style and content 
     images
     - proc_content is a single image
-    - proc_style is a tuple of images
+    - proc_style is a list of images
 
     The content image is preprocessed by converting the image to grayscale, then
     duplicating that grayscale image across all three image channels, ensuring

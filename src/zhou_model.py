@@ -52,14 +52,37 @@ class ZhouModel:
         self.vgg_style = self.__init_vgg(style_layers)
 
         # Create fields for the content, style, and stylized images.
-        self.content_img = self.__load_img(content_img_path)
-        self.style_img = self.__load_img(style_img_path)
+        self.content_img = self.__load_image(content_img_path, img_size)
+        self.style_img = self.__load_image(style_img_path, img_size)
         self.stylized_img = None
 
         # Get the augmented inputs.
         self.content_augment, self.style_augments\
             = self.__augment_data(content_img_path, style_img_path,\
             num_augmentations, img_size)
+
+
+    # Custom handler function for loading images, because the class currently
+    # only works with square images.
+    def __load_image(self, img_path, img_size):
+        """
+        Loads an image from the given path into a square tensor with sides of
+        the given dimension.
+
+        Parameters
+        - img_path (string): Path to the image.
+        - img_size (int): length of the image sides.
+
+        Returns
+        - img (tensor)
+        """
+
+        # Load in the image as a tensor and make it a square.
+        img_tensor = meth.load_img_as_tensor(img_path,\
+            dimension=img_size)
+        square_img_tensor = meth.squarify_tensor(img_tensor)
+
+        return square_img_tensor
 
 
     # A function for setting up the VGG19 instance.
@@ -79,11 +102,11 @@ class ZhouModel:
         # Initialize the VGG19 model.
         vgg19 = tf.keras.applications.VGG19(include_top=False,\
             weights='imagenet')
-        vgg19.trainable = false
+        vgg19.trainable = False
 
         # Set up and return the model with outputs from the specified layers.
-        outputs = [vgg19.get_layer(name) for name in layers]
-        model = tf.keras.Model([vgg.input], outputs)
+        outputs = [vgg19.get_layer(name).output for name in layers]
+        model = tf.keras.Model([vgg19.input], outputs)
         return model
 
 
@@ -108,17 +131,28 @@ class ZhouModel:
 
         # Get tensor representations of the content and style images, and
         # squarify them.
+        # Convert them into OpenCV images so the zhou_augment module can
+        # manipulate them.
         content_tensor = meth.load_img_as_tensor(content_img_path,\
             dimension=img_size)
         square_content_tensor = meth.squarify_tensor(content_tensor)
+        square_content_image = meth.tensor_to_cv2(square_content_tensor)
         style_tensor = meth.load_img_as_tensor(style_img_path,\
             dimension=img_size)
         square_style_tensor = meth.squarify_tensor(style_tensor)
+        square_style_image = meth.tensor_to_cv2(square_style_tensor)
 
         # Get the augmented images as a tuple
-        augment_tuple = zhou_augment.augment(square_content_tensor,\
-            square_style_tensor, num_augmentations)
-        return augment_tuple
+        augment_tuple = zhou_augment.augment(square_content_image,\
+            square_style_image, num_augmentations)
+
+        # Turn the images in the tuple into tensors.
+        proc_content = meth.cv2_image_to_tensor(augment_tuple[0])
+        proc_styles = []
+        for image in augment_tuple[1]:
+            proc_styles.append(meth.cv2_image_to_tensor(image))
+
+        return (proc_content, proc_style)
 
 
     def __total_loss(self, style_img, loss_weights):
@@ -266,13 +300,14 @@ class ZhouModel:
 
     # TODO: Add functionality for saving models and weights.
     # TODO: Add functionality for loading saved weights into the model.
-    # TODO: Add functionaliyt for displaying the stylized image.
+    # TODO: Add functionality for exporting TensorFlow Lite models.
+    # TODO: Add functionality for displaying the stylized image.
 
 
 def test():
     # Initialize some variables for testing
-    content_path = ""
-    style_path = ""
+    content_path = "../images/content/dubrovnik.png"
+    style_path = "../images/style/starry_night.png"
     weights = (1.0, 1.0, 1.0)
     epochs = 5
 

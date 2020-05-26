@@ -63,36 +63,41 @@ def load_img_as_tensor(path_to_img, dimension=512):
     img = tf.image.decode_image(img, channels=3)
     img = tf.image.convert_image_dtype(img, tf.float32)
 
-    # Compute new dimensions for the image
-    shape = tf.cast(tf.shape(img)[:-1], tf.float32)
-    short_dim = min(shape)
-    scale = max_dim / long_dim
-    new_shape = tf.cast(shape * scale, tf.int32)
+    # Resize the image to fit in a square of sides given by the dimension 
+    # paramater, preserving its original aspect ratio.
+    img = tf.image.resize(img, (dimension, dimension),\
+        preserve_aspect_ratio=True)
 
-    # Resize the image-tensor
-    img = tf.image.resize(img, new_shape)
-    img = img[tf.newaxis, :]
     return img
 
 
 # Takes a tensor and returns a square, centered slice of that tensor.
 def squarify_tensor(tensor):
     """
-    Returns the a square, centered slice of the given tensor.
+    Returns the a square of the given tensor.
 
     Parameters
     - tensor: A 3D image tensor.
     """
 
     # Get the length of the shortest of the width/height dimensions.
-    shape = tf.cast(tf.shape(tensor)[2:], tf.float32)
+    shape = tf.cast(tf.shape(tensor)[:2], tf.float32)
     short_side = min(shape)
     radius = short_side // 2
     # Find the center of the tensor.
     center = [shape[0] // 2, shape[1] // 2]
+    # Get the start and end indices of the slice.
+    vert_start = center[0] - radius
+    vert_end = vert_start + short_side
+    horiz_start = center[1] - radius
+    horiz_end = horiz_start + short_side
+    # Make the image a 4D tensor if needed.
+    if len(tf.shape(tensor)) == 3:
+        tensor = tf.expand_dims(tensor, 0)
     # Slice out the square.
-    square_tensor = tensor[center[0]-radius:center[0]+radius,\
-        center[1]-radius:center[1]+radius, :]
+    square_tensor = tf.image.crop_and_resize(tensor,\
+        [[vert_start, vert_end, horiz_start, horiz_end]], [0],\
+            [short_side, short_side])[:1, :, :, :]
     return square_tensor
 
 
@@ -224,3 +229,18 @@ def get_square_center(img, size=0):
     square_img = cv2.resize(square_img, (output_dim, output_dim))
 
     return square_img
+
+
+def tensor_to_cv2(tensor):
+    """
+    Convert an RGB image tensor to a BGR OpenCV image.
+
+    Parameters
+    - tensor (TensorFlow tensor)
+
+    Returns
+    - image (OpenCV image)
+    """
+    image = tensor.numpy()
+    cv_img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    return cv_img

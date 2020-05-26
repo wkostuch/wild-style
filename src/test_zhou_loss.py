@@ -18,7 +18,7 @@ class TestLossFunctions(unittest.TestCase):
         img = cv2.imread("../images/test/test_kitten.png", cv2.IMREAD_COLOR)
         img_tensor = meth.cv2_image_to_tensor(img)
         # Act
-        content_loss = loss._content_loss(img_tensor, img_tensor)
+        content_loss = loss.content_loss(img_tensor, img_tensor)
         # Assert
         self.assertEqual(content_loss, 0)
 

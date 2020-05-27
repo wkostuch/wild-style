@@ -10,6 +10,7 @@
   ~ Initial demo based on tutorial here: https://colab.research.google.com/github/tensorflow/hub/blob/master/examples/colab/tf2_arbitrary_image_stylization.ipynb#scrollTo=dqB6aNTLNVkK
 * Set up Python virtual environment for the code base.
   ~ Added requirements.txt file and README instructions for setting up the required dependencies.
+* Refactored Gatys method into a class in gatys_method.py
 
 ## Next Up
 * Discover new wasy of creating output images.
@@ -20,11 +21,7 @@
 * Fold pretrained more closely into the codebase.
   * Eliminate the need for dowloading VGG19 weights before running the code.
   * Get a locally-based copy of the model for fast style transfer.
-* Refactor base_demo.py into a class.
-  * Constructor takes content image path and style image path
-  * State is the result image.  Running the image through a processing step updates the state.
-  * Public member function to train and update the result given parameters for training steps and style/content weights.
-  * Public member function to return whatever the result image is right now.
+* Set up a nice data pipeline for the image augmentations.
    
 
 ## Down the Road
@@ -43,6 +40,6 @@
   * Photo-realstic on one end, style distortion on the other end
 
 * Pick two images from camera roll
-    * Have some style references built in
-    * Camera support? 
-        * If it's fast enough: video with limited frames; if it's slow then perhaps time-lapse 
+  * Have some style references built in
+  * Camera support? 
+    * If it's fast enough: video with limited frames; if it's slow then perhaps time-lapse 

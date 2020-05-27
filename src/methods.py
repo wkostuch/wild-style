@@ -101,6 +101,52 @@ def squarify_tensor(tensor):
     return square_tensor
 
 
+# Same thing as squarify_tensor, but for OpenCV and Numpy objects rather than
+# TensorFlow objects.
+def squarify_image(img, dim):
+    """
+    Crops out a centered square from an OpenCV image.
+
+    Parameters
+    - img (OpenCV image): Image to be cropped.
+    - dim (int): Length of the sides of the output image.
+
+    Returns
+    - sqr_img (OpenCV image): Cropped square from the center of the input image
+    with dimensions (dim, dim, 3).
+
+    This function takes the largest possible square that can fit in the original
+    image, then resizes it to have sides of length given by dim.
+    """
+
+    # Get the length of the shorter side, and use that as the length reference
+    # for getting a square from the image.
+    shape = img.shape[:2]
+    ref_side = min(shape)
+    # Make the length an even number.
+    if ref_side % 2 == 1:
+        ref_side = ref_side - 1
+    # Get the start and end indices across both dimensions.
+    height_start = (shape[0] - ref_side) // 2
+    height_end = height_start + ref_side
+    width_start = (shape[1] - ref_side) // 2
+    width_end = width_start + ref_side
+    # Slice a square out of the center of the input image.
+    sqr_img = img[height_start:height_end, width_start:width_end, :]
+    # Resize the image to the desired output size.
+    # Let the interpretation method depend on whether the image will be expanded
+    # or contracted.
+    # Use INTER_AREA interpolation for shrinking.
+    if ref_side >= dim:
+        sqr_img = cv2.resize(sqr_img, (dim, dim), interpolation=cv2.INTER_AREA)
+    # Use INTER_CUBIC interpolation for expanding.
+    elif ref_side < dim:
+        sqr_img = cv2.resize(sqr_img, (dim, dim), interpolation=cv2.INTER_CUBIC)
+    # Return the resized image.
+    return sqr_img
+
+
+
 # Takes a tensor and returns one that can be displayed via Pillow
 def tensor_to_image(tensor):
     """

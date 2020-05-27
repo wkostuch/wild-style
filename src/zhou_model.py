@@ -245,6 +245,7 @@ class ZhouModel:
 
 
     # Train the model.
+    # TODO: Figure out how to do batching.
     def train(self, loss_weights=(1.0, 5.0, 1.0), epochs=100, batch_size=4,\
         learning_rate=1e-3):
         """

@@ -21,10 +21,12 @@
 * Fold pretrained more closely into the codebase.
   * Eliminate the need for dowloading VGG19 weights before running the code.
   * Get a locally-based copy of the model for fast style transfer.
-* Set up a nice data pipeline for the image augmentations.
+* Set up a TensorFlow data pipeline for the image augmentations.
+* Write unit tests for methods.py
    
 
 ## Down the Road
+* Generalize the methods in zhou_loss.py to work on batches.
 * Compile some pretrained models for "plug and play" functionality.
 * Do style transfer in real-time with video.
 * Do style transfer on specific objects in the image, while preserving the rest of the image.

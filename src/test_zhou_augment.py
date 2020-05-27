@@ -78,6 +78,9 @@ class TestAugmentFunctions(unittest.TestCase):
         augments = zhou_augment._augment_style(img, 10)
         # Assert
         self.assertEqual(len(augments), 10)
+        for aug in augments:
+            self.assertEqual(aug.shape, img.shape)
+            self.assertEqual(aug.shape[2], 3)
 
 
 def test():

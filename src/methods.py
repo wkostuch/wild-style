@@ -103,6 +103,7 @@ def squarify_tensor(tensor):
 
 # Same thing as squarify_tensor, but for OpenCV and Numpy objects rather than
 # TensorFlow objects.
+# This function works for sure, squarify_tensor hasn't been fully tested yet.
 def squarify_image(img, dim):
     """
     Crops out a centered square from an OpenCV image.

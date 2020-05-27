@@ -5,6 +5,7 @@
 
 # All necessary Python packages are included in the requirements.txt file in 
 # the root directory of the repository.
+import cv2
 import methods as meth
 import os
 import random
@@ -54,7 +55,9 @@ class ZhouModel:
         # Create fields for the content, style, and stylized images.
         self.content_img = self.__load_image(content_img_path, img_size)
         self.style_img = self.__load_image(style_img_path, img_size)
-        self.stylized_img = None
+        # Initialize the stylized image to just be the content image.  The image
+        # stored in this field will be updated as the model is trained.
+        self.stylized_img = self.__load_image(content_img_path, img_size)
 
         # Get the augmented inputs.
         self.content_augment, self.style_augments\
@@ -64,6 +67,7 @@ class ZhouModel:
 
     # Custom handler function for loading images, because the class currently
     # only works with square images.
+    # TODO: Generalize to various sizes and aspect ratios.
     def __load_image(self, img_path, img_size):
         """
         Loads an image from the given path into a square tensor with sides of
@@ -74,15 +78,15 @@ class ZhouModel:
         - img_size (int): length of the image sides.
 
         Returns
-        - img (tensor)
+        - square_image_tensor (tensor)
         """
 
-        # Load in the image as a tensor and make it a square.
-        img_tensor = meth.load_img_as_tensor(img_path,\
-            dimension=img_size)
-        square_img_tensor = meth.squarify_tensor(img_tensor)
+        # Load the image with OpenCV, and squarify it.
+        image = meth.import_image(img_path)
+        square_image = meth.squarify_image(image, img_size)
+        square_image_tensor = meth.cv2_image_to_tensor(square_image)
 
-        return square_img_tensor
+        return square_image_tensor
 
 
     # A function for setting up the VGG19 instance.
@@ -129,28 +133,26 @@ class ZhouModel:
         and a list of the augmented style images.
         """
 
-        # Get tensor representations of the content and style images, and
-        # squarify them.
-        # Convert them into OpenCV images so the zhou_augment module can
-        # manipulate them.
-        content_tensor = meth.load_img_as_tensor(content_img_path,\
-            dimension=img_size)
-        square_content_tensor = meth.squarify_tensor(content_tensor)
-        square_content_image = meth.tensor_to_cv2(square_content_tensor)
-        style_tensor = meth.load_img_as_tensor(style_img_path,\
-            dimension=img_size)
-        square_style_tensor = meth.squarify_tensor(style_tensor)
-        square_style_image = meth.tensor_to_cv2(square_style_tensor)
+        # Get OpenCV representations of the content and style images for 
+        # augmentation.
+        con_img = meth.import_image(content_img_path)
+        con_img = meth.squarify_image(con_img, img_size)
+        sty_img = meth.import_image(style_img_path)
+        sty_img = meth.squarify_image(sty_img, img_size)
 
         # Get the augmented images as a tuple
-        augment_tuple = zhou_augment.augment(square_content_image,\
-            square_style_image, num_augmentations)
+        augment_tuple = zhou_augment.augment(con_img, sty_img,\
+            num_augmentations)
 
         # Turn the images in the tuple into tensors.
         proc_content = meth.cv2_image_to_tensor(augment_tuple[0])
         proc_styles = []
+        # For testing
+        i = 0
         for image in augment_tuple[1]:
             proc_styles.append(meth.cv2_image_to_tensor(image))
+            i += 1
+            print(f"{i} style image augmentations produced")
 
         return (proc_content, proc_style)
 

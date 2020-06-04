@@ -7,11 +7,11 @@
 # the root directory of the repository.
 import cv2
 import methods as meth
-import os
 import random
 import tensorflow as tf
 import zhou_augment
 import zhou_loss
+from zhou_pipeline import Pipeline
 from zhou_stylize import Stylizer
 
 
@@ -47,35 +47,40 @@ class ZhouModel:
         # Instantiate an untrained stylization model.
         self.zhou = Stylizer(output_activation=output_activation)
 
+        # Save the image filepaths.
+        self.content_path = content_img_path
+        self.style_path = style_img_path
+
+        # Save the image size for easy access.
+        self.img_size = img_size
+
         # Set up two VGG19 networks; one for activating the content image, one
         # for activating the style image.
         self.vgg_content = self.__init_vgg(content_layers)
         self.vgg_style = self.__init_vgg(style_layers)
 
         # Create fields for the content, style, and stylized images.
-        self.content_img = self.__load_image(content_img_path, img_size)
-        self.style_img = self.__load_image(style_img_path, img_size)
+        self.content_img = self.__load_image(content_img_path)
+        self.style_img = self.__load_image(style_img_path)
         # Initialize the stylized image to just be the content image.  The image
         # stored in this field will be updated as the model is trained.
-        self.stylized_img = self.__load_image(content_img_path, img_size)
+        self.stylized_img = self.__load_image(content_img_path)
 
-        # Get the augmented inputs.
-        self.content_augment, self.style_augments\
-            = self.__augment_data(content_img_path, style_img_path,\
-            num_augmentations, img_size)
+        # Get the augmented content.
+        # Augmented style data will be provided as needed during training.
+        self.content_augment = self.__augment_content(content_img_path)
 
 
     # Custom handler function for loading images, because the class currently
     # only works with square images.
     # TODO: Generalize to various sizes and aspect ratios.
-    def __load_image(self, img_path, img_size):
+    def __load_image(self, img_path):
         """
         Loads an image from the given path into a square tensor with sides of
         the given dimension.
 
         Parameters
         - img_path (string): Path to the image.
-        - img_size (int): length of the image sides.
 
         Returns
         - square_image_tensor (tensor)
@@ -83,10 +88,56 @@ class ZhouModel:
 
         # Load the image with OpenCV, and squarify it.
         image = meth.import_image(img_path)
-        square_image = meth.squarify_image(image, img_size)
+        square_image = meth.squarify_image(image, self.img_size)
         square_image_tensor = meth.cv2_image_to_tensor(square_image)
 
         return square_image_tensor
+
+
+    # A function for obtaining the augmentation of the content image.
+    def __augment_content(self, img_path):
+        """
+        Loads an image from the given path into a square image, and returns a
+        tensor representation of its content augmentation.
+
+        Parameters
+        - img_path (string): Path to the image.
+
+        Returns
+        - img_tensor (tensor)
+        """
+
+        # Load the image with OpenCV, and squarify it.
+        img = meth.import_image(img_path)
+        square_image = meth.squarify_image(img, self.img_size)
+        # Get the content augmentation and convert it to a tensor.
+        zhou_augment._gray_content(img)
+        img_tensor = meth.cv2_image_to_tensor(img)
+
+        return img_tensor
+
+
+    # Sets up the training pipeline.
+    def __build_training_pipeline(self, style_img_path, batch_size):
+        """
+        Sets up and returns a training pipeline.
+
+        Parameters
+        - style_img_path (string): Path to the file location of the style image.
+        - batch_size (int): Number of augmentations to be contained in a batch.
+
+        Returns
+        - pipeline (iterable object): Iterable object that produces batches of
+        style image augmentations.
+        """
+
+        # Load the image with OpenCV, and squarify it.
+        img = meth.import_image(img_path)
+        square_image = meth.squarify_image(img, self.img_size)
+        # Get the data pipeline.
+        pipeline = Pipeline(square_image)
+
+        return pipeline
 
 
     # A function for setting up the VGG19 instance.
@@ -273,28 +324,27 @@ class ZhouModel:
         opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
         # Initialize the loss function flag.
         use_total_loss = True
+        # Initialize the training data pipeline.
+        pipe = self.__build_training_pipeline(self.style_path)
+        # Get a TensorFlow Dataset object
+        dataset = tf.data.Dataset.from_generator(pipe.get_augmentation,\
+            tf.float32)
+        # Get the dataset in batches.
+        dataset = dataset.batch(batch_size).repeat(epochs)
 
         # Iterate over the given number of epochs.
         for epoch in range(epochs):
             print(f"Beginning Epoch {epoch}/{epochs}")
-            # Get the number of iterations, then iterate over them.
-            iterations = len(self.style_augments) // batch_size
-            for i in range(iterations):
+            ds_iter = iter(dataset)
+            for batch in ds_iter:
                 # Use total loss function on even iterations.  Use content loss
                 # only on odd iterations.
                 if i % 2 == 0:
                     use_total_loss = True
                 else:
                     use_total_loss = False
-                # Get style image augmentations, working through all the style 
-                # augmentations consecutively.
-                batch = []
-                for j in range(batch_size):
-                    style_datum = self.style_augments[random.randint(0,\
-                        len(self.style_augments))]
-                    batch.append(style_datum)
-                for img in batch:
-                    self.__train_step(img, use_total_loss, opt)
+                # Train on style image augmentations.
+                self.__train_step(batch, use_total_loss, opt)
 
             # Display the stylized image at the end of each epoch.
             # TODO: Delete this line once testing is completed.
